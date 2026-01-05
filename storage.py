@@ -49,6 +49,8 @@ class FileSystemStorage:
             if self.is_shared_with(owner, original_cal_name, username):
                 return os.path.join(self._user_dir(owner), original_cal_name)
         
+        # Log failure
+        print(f"DEBUG: Could not resolve path for {username}/{calendar_name}. Checked {local_path}")
         return local_path
 
     def is_shared_with(self, owner, calendar_name, target_user):
@@ -150,13 +152,19 @@ class FileSystemStorage:
     def save_event(self, username, calendar_name, event_uid, ics_data):
         cal_path = self._resolve_calendar_path(username, calendar_name)
         if not os.path.exists(cal_path):
+            print(f"DEBUG: save_event failed. Calendar path does not exist: {cal_path}")
             return False
         
         filename = f"{event_uid}.ics"
         path = os.path.join(cal_path, filename)
-        with open(path, 'w') as f:
-            f.write(ics_data)
-        return True
+        print(f"DEBUG: Saving event to {path}")
+        try:
+            with open(path, 'w') as f:
+                f.write(ics_data)
+            return True
+        except Exception as e:
+            print(f"DEBUG: Error writing file {path}: {e}")
+            return False
 
     def delete_event(self, username, calendar_name, event_uid):
         cal_path = self._resolve_calendar_path(username, calendar_name)
