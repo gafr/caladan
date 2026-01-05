@@ -1,4 +1,5 @@
 import vobject
+import os
 from flask import request, Response
 from xml.etree.ElementTree import Element, SubElement, tostring, fromstring, QName
 import datetime
@@ -23,6 +24,7 @@ register_namespaces()
 class CalDAVHandler:
     def __init__(self, storage):
         self.storage = storage
+        self.verbose = os.environ.get('APP_VERBOSE', 'false').lower() == 'true'
 
     def _create_multistatus_response(self, responses):
         root = Element(f'{{{NS_DAV}}}multistatus')
