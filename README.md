@@ -1,6 +1,6 @@
 # <img src="static/logo.svg" height="50" align="center"> Caladan CalDAV Server
 
-![License](https://img.shields.io/github/license/gafr/caladan?style=flat-square)
+![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
 ![Python](https://img.shields.io/badge/python-3.9+-blue.svg?style=flat-square&logo=python&logoColor=white)
 ![Docker](https://img.shields.io/badge/docker-ready-blue.svg?style=flat-square&logo=docker&logoColor=white)
 ![LDAP](https://img.shields.io/badge/LDAP-Authentik-orange?style=flat-square)
