@@ -53,6 +53,29 @@ class CalDAVHandler:
 
         return tostring(root, encoding='utf-8', xml_declaration=True)
 
+    def handle_root_propfind(self, username):
+        """
+        Handles PROPFIND on the server root to discover current-user-principal.
+        """
+        # We need to construct a response that points to the user's principal URL.
+        # In our simple server, /{username}/ acts as the principal URL.
+        
+        def make_href_prop(ns, name, value):
+            el = Element(f'{{{ns}}}{name}')
+            h = SubElement(el, f'{{{NS_DAV}}}href')
+            h.text = value
+            return el
+
+        props = {
+            (NS_DAV, 'resourcetype'): self._make_resourcetype(collection=True),
+            (NS_DAV, 'current-user-principal'): make_href_prop(NS_DAV, 'current-user-principal', f"/{username}/"),
+            # Some clients also look for this directly on root
+            (NS_CAL, 'calendar-home-set'): make_href_prop(NS_CAL, 'calendar-home-set', f"/{username}/"),
+        }
+        
+        responses = [('/', 'HTTP/1.1 200 OK', props)]
+        return Response(self._create_multistatus_response(responses), 207, mimetype='application/xml; charset=utf-8')
+
     def handle_propfind(self, username, path, depth='0'):
         # Simplified PROPFIND handler
         # path is like /username/calendar_name/ or /username/
