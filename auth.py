@@ -20,12 +20,15 @@ class AuthProvider:
             self.users[self.default_username] = self.default_password
 
     def _check_ldap(self, username, password):
+        verbose = os.environ.get('LDAP_VERBOSE', 'false').lower() == 'true'
+        
         if not LDAP_AVAILABLE:
-            print("LDAP not available (ldap3 library missing)")
+            if verbose: print("LDAP DEBUG: ldap3 library not available")
             return False
             
         ldap_server = os.environ.get('LDAP_SERVER')
         if not ldap_server:
+            if verbose: print("LDAP DEBUG: LDAP_SERVER not set")
             return False
 
         base_dn = os.environ.get('LDAP_BASE_DN', 'dc=ldap,dc=goauthentik,dc=io')
@@ -33,28 +36,37 @@ class AuthProvider:
         bind_pass = os.environ.get('LDAP_BIND_PASSWORD')
         user_filter = os.environ.get('LDAP_USER_FILTER', '(uid={0})')
 
+        if verbose:
+            print(f"LDAP DEBUG: Connecting to {ldap_server}")
+            print(f"LDAP DEBUG: Bind DN: {bind_dn}")
+            print(f"LDAP DEBUG: Base DN: {base_dn}")
+
         try:
             # 1. Connect and Bind (Service Account or Anonymous)
             server = Server(ldap_server, get_info=ALL)
             conn = Connection(server, user=bind_dn, password=bind_pass, auto_bind=True)
+            if verbose: print("LDAP DEBUG: Service bind successful")
             
             # 2. Search for the user
             search_filter = user_filter.format(username)
+            if verbose: print(f"LDAP DEBUG: Searching with filter {search_filter}")
+            
             conn.search(base_dn, search_filter, attributes=['dn'])
             
             if not conn.entries:
-                print(f"LDAP: User {username} not found")
+                if verbose: print(f"LDAP DEBUG: User {username} not found")
                 return False
             
             user_dn = conn.entries[0].entry_dn
+            if verbose: print(f"LDAP DEBUG: Found user DN: {user_dn}")
             
             # 3. Verify password by rebinding
             user_conn = Connection(server, user=user_dn, password=password)
             if user_conn.bind():
-                print(f"LDAP: User {username} authenticated successfully")
+                if verbose: print(f"LDAP DEBUG: User {username} authenticated successfully")
                 return True
             else:
-                print(f"LDAP: Password verification failed for {username}")
+                if verbose: print(f"LDAP DEBUG: Password verification failed for {username}")
                 return False
                 
         except Exception as e:

@@ -76,6 +76,7 @@ Integrate with an external identity provider.
 | `LDAP_BIND_DN` | `cn=service_account,...` | DN of the user used to search the directory. |
 | `LDAP_BIND_PASSWORD` | `secret` | Password for the bind user. |
 | `LDAP_USER_FILTER` | `(uid={0})` | Filter to find users. `{0}` is replaced by the username. |
+| `LDAP_VERBOSE` | `false` | Enable detailed debug logging for LDAP operations. |
 
 ### Authentik Setup Guide
 
