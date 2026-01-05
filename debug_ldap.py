@@ -21,7 +21,8 @@ def debug_ldap():
         
         print(f"\nSearching for ALL objects under {base_dn}...")
         # Search for everything with a 'cn' attribute
-        conn.search(base_dn, '(objectClass=*)', attributes=['cn', 'uid', 'sAMAccountName', 'entryUUID'])
+        # We only ask for 'cn' and 'uid' to be safe with Authentik
+        conn.search(base_dn, '(objectClass=*)', attributes=['cn', 'uid', 'mail'])
         
         print(f"Found {len(conn.entries)} entries:\n")
         for entry in conn.entries:
