@@ -198,12 +198,14 @@ def dav_route(username, path):
     full_path = f"{username}/{path}"
     
     # Debug logging
-    print(f"[{method}] {full_path}")
-    if method in ['PROPFIND', 'REPORT']:
-        try:
-            print(request.data.decode('utf-8'))
-        except:
-            print("<binary data>")
+    verbose = os.environ.get('APP_VERBOSE', 'false').lower() == 'true'
+    if verbose:
+        print(f"[{method}] {full_path}")
+        if method in ['PROPFIND', 'REPORT']:
+            try:
+                print(request.data.decode('utf-8'))
+            except:
+                print("<binary data>")
 
     if method == 'OPTIONS':
         resp = Response("", 200)
@@ -250,7 +252,9 @@ def catch_all(path):
     # However, since the dav_route handles /<username>/..., this might catch 
     # things like /.well-known/ or /principals/
     
-    print(f"DEBUG: Unhandled request to /{path} method={request.method}")
+    verbose = os.environ.get('APP_VERBOSE', 'false').lower() == 'true'
+    if verbose:
+        print(f"DEBUG: Unhandled request to /{path} method={request.method}")
     # Still try to be helpful for discovery
     if path.startswith('.well-known'):
          return redirect(f'/{auth_provider.get_username()}/')

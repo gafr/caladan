@@ -251,10 +251,10 @@ class CalDAVHandler:
         return Response(self._create_multistatus_response(responses), 207, mimetype='application/xml; charset=utf-8')
 
     def handle_put(self, username, path, data):
-        print(f"DEBUG: PUT request for {path}")
+        if self.verbose: print(f"DEBUG: PUT request for {path}")
         parts = path.strip('/').split('/')
         if len(parts) != 3:
-             print("DEBUG: Invalid path structure")
+             if self.verbose: print("DEBUG: Invalid path structure")
              return Response("Forbidden", 403)
         
         cal_name = parts[1]
@@ -268,24 +268,24 @@ class CalDAVHandler:
             else:
                 data_str = data
             
-            print(f"DEBUG: Received {len(data_str)} bytes of data")
+            if self.verbose: print(f"DEBUG: Received {len(data_str)} bytes of data")
             
             v = vobject.readOne(data_str)
             if v.name != 'VCALENDAR':
-                print("DEBUG: Content is not VCALENDAR")
+                if self.verbose: print("DEBUG: Content is not VCALENDAR")
                 raise ValueError("Not a VCALENDAR")
         except Exception as e:
-            print(f"DEBUG: VObject parsing error: {e}")
+            if self.verbose: print(f"DEBUG: VObject parsing error: {e}")
             return Response(f"Invalid Calendar Data: {e}", 400)
         
         if self.storage.save_event(username, cal_name, uid, data_str):
-            print(f"DEBUG: Event saved successfully for {username}/{cal_name}/{uid}")
+            if self.verbose: print(f"DEBUG: Event saved successfully for {username}/{cal_name}/{uid}")
             # Return ETag
             resp = Response("", 201)
             resp.headers['ETag'] = '"' + str(datetime.datetime.now().timestamp()) + '"'
             return resp
         else:
-            print(f"DEBUG: Failed to save event (storage returned False)")
+            if self.verbose: print(f"DEBUG: Failed to save event (storage returned False)")
             return Response("Internal Server Error", 500)
 
     def handle_delete(self, username, path):
