@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100">
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0d6efd;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6610f2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Icon: A planet rising over a calendar page -->
+  <g transform="translate(20, 10)">
+    <!-- Calendar Page -->
+    <rect x="10" y="10" width="60" height="60" rx="8" fill="none" stroke="url(#grad1)" stroke-width="4" />
+    <!-- Planet -->
+    <circle cx="65" cy="25" r="12" fill="url(#grad1)" />
+    <!-- Lines -->
+    <line x1="25" y1="35" x2="55" y2="35" stroke="#333" stroke-width="3" stroke-linecap="round" />
+    <line x1="25" y1="50" x2="55" y2="50" stroke="#333" stroke-width="3" stroke-linecap="round" />
+  </g>
+  
+  <!-- Text -->
+  <text x="100" y="65" font-family="sans-serif" font-weight="bold" font-size="50" fill="#333">
+    Caladan
+  </text>
+</svg>

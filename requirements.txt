@@ -1,0 +1,6 @@
+Flask==3.0.0
+vobject==0.9.6.1
+defusedxml==0.7.1
+python-dateutil==2.8.2
+Werkzeug==3.0.1
+ldap3==2.9.1

@@ -1,0 +1,11 @@
+services:
+  caldav-server:
+    build: .
+    container_name: caladan
+    ports:
+      - "5001:5001"
+    volumes:
+      - ./data:/app/data
+    env_file:
+      - .env
+    restart: unless-stopped
