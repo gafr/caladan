@@ -203,6 +203,23 @@ def dav_route(username, path):
 
     return Response("Method Not Allowed", 405)
 
+# Catch-all for debugging unknown client requests
+@app.route('/', defaults={'path': ''}, methods=['GET', 'PUT', 'DELETE', 'PROPFIND', 'REPORT', 'OPTIONS', 'PROPPATCH'])
+@app.route('/<path:path>', methods=['GET', 'PUT', 'DELETE', 'PROPFIND', 'REPORT', 'OPTIONS', 'PROPPATCH'])
+def catch_all(path):
+    # This route is lower priority than the specific routes defined below?
+    # Actually Flask routes are matched in order or specificity.
+    # We should place this AT THE END or ensure specific routes are matched first.
+    # However, since the dav_route handles /<username>/..., this might catch 
+    # things like /.well-known/ or /principals/
+    
+    print(f"DEBUG: Unhandled request to /{path} method={request.method}")
+    # Still try to be helpful for discovery
+    if path.startswith('.well-known'):
+         return redirect(f'/{auth_provider.get_username()}/')
+
+    return Response("Not Found", 404)
+
 if __name__ == '__main__':
     # When behind a reverse proxy like Traefik, SSL is usually handled there.
     # We check if certs exist, otherwise run plain HTTP.
