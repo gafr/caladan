@@ -75,7 +75,7 @@ Integrate with an external identity provider.
 | `LDAP_BASE_DN` | `dc=ldap,dc=goauthentik,dc=io` | Base DN for user search. |
 | `LDAP_BIND_DN` | `cn=service_account,...` | DN of the user used to search the directory. |
 | `LDAP_BIND_PASSWORD` | `secret` | Password for the bind user. |
-| `LDAP_USER_FILTER` | `(uid={0})` | Filter to find users. `{0}` is replaced by the username. |
+| `LDAP_USER_FILTER` | `(cn={0})` | Filter to find users. Authentik typically uses `cn`. |
 | `LDAP_VERBOSE` | `false` | Enable detailed debug logging for LDAP operations. |
 
 ### Authentik Setup Guide
@@ -92,6 +92,7 @@ To use Authentik as your LDAP provider:
     -   Go to **Applications** -> **Applications** -> **Create**.
     -   **Name**: `Caladan`.
     -   **Provider**: Select the `Caladan LDAP` provider.
+    -   **Important**: Ensure your users or groups are **assigned** to this application under the "Policy / Group / User" bindings. Users not assigned will not appear in the LDAP search.
 
 3.  **Create a Service Account:**
     -   Go to **Directory** -> **Users** -> **Create Service Account**.
@@ -101,7 +102,7 @@ To use Authentik as your LDAP provider:
 
 4.  **Configure Outpost:**
     -   Ensure your **Embedded Outpost** (or a dedicated one) includes the `Caladan` application.
-    -   Note the IP and Port (usually 3389 for standard LDAP or 636 for LDAPS).
+    -   Note the IP and Port (usually 3389 internally, often mapped to 389 on the host).
 
 ## Project Structure
 
