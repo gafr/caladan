@@ -32,9 +32,11 @@ def logout():
 # --- Service Discovery & Principal Handling ---
 
 @app.route('/.well-known/caldav', methods=['GET', 'PROPFIND'])
+@auth_provider.requires_auth
 def well_known_caldav():
-    # Redirect to the root, where we handle principal discovery
-    return redirect('/', code=301)
+    # Redirect to the user root which acts as principal
+    username = auth_provider.get_username()
+    return redirect(f'/{username}/', code=301)
 
 @app.route('/', methods=['PROPFIND', 'OPTIONS'])
 @auth_provider.requires_auth

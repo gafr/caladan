@@ -126,6 +126,20 @@ class FileSystemStorage:
             
         return calendars
 
+    def get_calendar_ctag(self, username, calendar_name):
+        cal_path = self._resolve_calendar_path(username, calendar_name)
+        if os.path.exists(cal_path):
+            # Use directory mtime as CTag. 
+            # Note: In Linux, directory mtime changes when files are added/removed, 
+            # but NOT when file content changes. 
+            # For a proper CTag, we should check max(file_mtimes).
+            # But for now, directory mtime is better than nothing or random.
+            # Let's try to do it slightly better: max of dir mtime and latest file mtime?
+            # That might be slow for listing.
+            # Let's stick to dir mtime for speed, but if we want correctness we might need to touch dir on write.
+            return str(os.path.getmtime(cal_path))
+        return "0"
+
     def get_calendar_events(self, username, calendar_name):
         cal_path = self._resolve_calendar_path(username, calendar_name)
         if not os.path.exists(cal_path):
@@ -162,6 +176,8 @@ class FileSystemStorage:
         try:
             with open(path, 'w') as f:
                 f.write(ics_data)
+            # Update calendar directory mtime to update CTag
+            os.utime(cal_path, None)
             return True
         except Exception as e:
             if self.verbose: print(f"DEBUG: Error writing file {path}: {e}")

@@ -117,7 +117,8 @@ class CalDAVHandler:
                     c_props = {
                         (NS_DAV, 'resourcetype'): self._make_resourcetype(collection=True, calendar=True),
                         (NS_DAV, 'displayname'): cal,
-                        (NS_CAL, 'supported-calendar-component-set'): self._make_comp_set(['VEVENT'])
+                        (NS_CAL, 'supported-calendar-component-set'): self._make_comp_set(['VEVENT']),
+                        (NS_CS, 'getctag'): self.storage.get_calendar_ctag(username, cal)
                     }
                     responses.append((f"{base_url}/{cal}/", 'HTTP/1.1 200 OK', c_props))
 
@@ -129,7 +130,7 @@ class CalDAVHandler:
                 (NS_DAV, 'displayname'): cal_name,
                 (NS_CAL, 'supported-calendar-component-set'): self._make_comp_set(['VEVENT']),
                 # CTag is important for clients to know if sync is needed
-                (NS_CS, 'getctag'): str(datetime.datetime.now().timestamp()) 
+                (NS_CS, 'getctag'): self.storage.get_calendar_ctag(username, cal_name) 
             }
             responses.append((base_url + '/', 'HTTP/1.1 200 OK', props))
 
