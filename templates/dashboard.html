@@ -60,7 +60,8 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Target User (Authentik Username)</label>
-                            <input type="text" id="target-user" class="form-control" placeholder="e.g. alice" required>
+                            <input type="text" id="target-user" class="form-control" placeholder="e.g. alice" required list="user-suggestions" autocomplete="off">
+                            <datalist id="user-suggestions"></datalist>
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Share</button>
                     </form>
@@ -219,7 +220,40 @@
                 });
                 calendarInstance.render();
             }, { once: true });
+            loadData();
         }
+
+        // Autocomplete Logic
+        let debounceTimer;
+        const targetUserInput = document.getElementById('target-user');
+        const userDatalist = document.getElementById('user-suggestions');
+
+        targetUserInput.addEventListener('input', (e) => {
+            clearTimeout(debounceTimer);
+            const query = e.target.value;
+            
+            if (query.length < 2) {
+                userDatalist.innerHTML = '';
+                return;
+            }
+
+            debounceTimer = setTimeout(async () => {
+                try {
+                    const res = await fetch(`/api/users/search?q=${encodeURIComponent(query)}`);
+                    if (res.ok) {
+                        const users = await res.json();
+                        userDatalist.innerHTML = '';
+                        users.forEach(user => {
+                            const option = document.createElement('option');
+                            option.value = user;
+                            userDatalist.appendChild(option);
+                        });
+                    }
+                } catch (err) {
+                    console.error('Error fetching users:', err);
+                }
+            }, 300); // 300ms debounce
+        });
 
         loadData();
     </script>

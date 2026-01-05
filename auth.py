@@ -75,6 +75,43 @@ class AuthProvider:
             print(f"LDAP Error: {e}")
             return False
 
+    def search_users(self, query):
+        """Search for users matching the query string."""
+        results = []
+        
+        # 1. Search LDAP if configured
+        ldap_server = os.environ.get('LDAP_SERVER')
+        if ldap_server and len(query) >= 2:
+            try:
+                base_dn = os.environ.get('LDAP_BASE_DN', 'dc=ldap,dc=goauthentik,dc=io')
+                bind_dn = os.environ.get('LDAP_BIND_DN')
+                bind_pass = os.environ.get('LDAP_BIND_PASSWORD')
+                
+                # Use CN for search as per Authentik setup
+                search_filter = f"(&(objectClass=*)(cn=*{query}*))"
+                
+                server = Server(ldap_server, get_info=ALL)
+                conn = Connection(server, user=bind_dn, password=bind_pass, auto_bind=True)
+                
+                conn.search(base_dn, search_filter, attributes=['cn', 'uid'])
+                
+                for entry in conn.entries:
+                    # Prefer CN, fallback to UID
+                    if 'cn' in entry and entry.cn:
+                         results.append(str(entry.cn[0]))
+                    elif 'uid' in entry and entry.uid:
+                         results.append(str(entry.uid[0]))
+                         
+            except Exception as e:
+                print(f"LDAP Search Error: {e}")
+
+        # 2. Add local users if matching
+        if self.enable_default_user:
+            if query.lower() in self.default_username.lower():
+                results.append(self.default_username)
+                
+        return sorted(list(set(results)))
+
     def check_auth(self, username, password):
         """This function is called to check if a username /
         password combination is valid."""

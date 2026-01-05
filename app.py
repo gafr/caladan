@@ -63,6 +63,16 @@ def api_create_calendar():
     else:
         return jsonify({'error': 'Calendar already exists'}), 409
 
+@app.route('/api/users/search')
+@auth_provider.requires_auth
+def api_search_users():
+    query = request.args.get('q', '')
+    if len(query) < 2:
+        return jsonify([])
+    
+    users = auth_provider.search_users(query)
+    return jsonify(users)
+
 @app.route('/api/calendars/<calendar_name>/events')
 @auth_provider.requires_auth
 def api_calendar_events(calendar_name):
