@@ -77,6 +77,31 @@ Integrate with an external identity provider.
 | `LDAP_BIND_PASSWORD` | `secret` | Password for the bind user. |
 | `LDAP_USER_FILTER` | `(uid={0})` | Filter to find users. `{0}` is replaced by the username. |
 
+### Authentik Setup Guide
+
+To use Authentik as your LDAP provider:
+
+1.  **Create an LDAP Provider:**
+    -   Go to **Applications** -> **Providers** -> **Create** -> **LDAP Provider**.
+    -   **Name**: `Caladan LDAP`.
+    -   **Base DN**: e.g., `dc=ldap,dc=goauthentik,dc=io`.
+    -   **Bind DN**: Note the provided Bind DN (e.g., `cn=ldapservice,ou=users,...`).
+
+2.  **Create an Application:**
+    -   Go to **Applications** -> **Applications** -> **Create**.
+    -   **Name**: `Caladan`.
+    -   **Provider**: Select the `Caladan LDAP` provider.
+
+3.  **Create a Service Account:**
+    -   Go to **Directory** -> **Users** -> **Create Service Account**.
+    -   **Username**: `caladan_svc`.
+    -   **Password**: Set a strong password (this is your `LDAP_BIND_PASSWORD`).
+    -   **Get DN**: The DN is usually `cn=caladan_svc,ou=users,dc=ldap,dc=goauthentik,dc=io`.
+
+4.  **Configure Outpost:**
+    -   Ensure your **Embedded Outpost** (or a dedicated one) includes the `Caladan` application.
+    -   Note the IP and Port (usually 3389 for standard LDAP or 636 for LDAPS).
+
 ## Project Structure
 
 -   `app.py`: Main Flask application entry point.
