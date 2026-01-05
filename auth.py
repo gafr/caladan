@@ -51,7 +51,9 @@ class AuthProvider:
             search_filter = user_filter.format(username)
             if verbose: print(f"LDAP DEBUG: Searching with filter {search_filter}")
             
-            conn.search(base_dn, search_filter, attributes=['dn'])
+            # We request 'cn' instead of 'dn' because 'dn' is not a valid attribute to request
+            # on some LDAP servers (like Authentik). entry_dn is always returned in metadata.
+            conn.search(base_dn, search_filter, attributes=['cn'])
             
             if not conn.entries:
                 if verbose: print(f"LDAP DEBUG: User {username} not found")
