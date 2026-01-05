@@ -5,6 +5,9 @@ from flask import Flask, request, Response, redirect, render_template, jsonify
 from auth import auth_provider
 from storage import storage
 from caldav_handler import CalDAVHandler
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = Flask(__name__)
 handler = CalDAVHandler(storage)
