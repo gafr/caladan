@@ -21,7 +21,10 @@
                 <img src="/static/logo.svg" alt="Caladan Logo" height="40" class="me-2 bg-white rounded p-1">
                 Caladan CalDAV
             </span>
-            <span class="navbar-text">Welcome, <strong>{{ username }}</strong></span>
+            <div class="d-flex align-items-center">
+                <span class="navbar-text me-3">Welcome, <strong>{{ username }}</strong></span>
+                <button class="btn btn-outline-light btn-sm" onclick="logout()">Logout</button>
+            </div>
         </div>
     </nav>
 
@@ -194,6 +197,10 @@
                 body: JSON.stringify({calendar, target_user})
             });
             loadData();
+        }
+
+        function logout() {
+            window.location.href = '/logout';
         }
 
         async function openCalendar(calendarName) {

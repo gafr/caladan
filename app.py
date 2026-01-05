@@ -21,6 +21,14 @@ def index():
 def dashboard():
     return render_template('dashboard.html', username=auth_provider.get_username())
 
+@app.route('/logout')
+def logout():
+    # Simple way to logout of Basic Auth is to send a 401 
+    # but without the auth_provider wrapper to avoid infinite loops
+    return Response(
+        'Logged out.', 401,
+        {'WWW-Authenticate': 'Basic realm="Login Required"'})
+
 @app.route('/api/calendars')
 @auth_provider.requires_auth
 def api_calendars():
